@@ -156,7 +156,11 @@ app.post('/pix/webhook-config', requireRelaySecret, async (req, res) => {
       `${EFIPAY_BASE}/v2/webhook/${PIX_KEY}`,
       { webhookUrl: webhookUrl || WEBHOOK_FORWARD_URL },
       {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'x-skip-mtls-checking': 'true',
+        },
         httpsAgent: getAgent(),
       }
     );
