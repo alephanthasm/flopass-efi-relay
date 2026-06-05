@@ -20,9 +20,9 @@ const isSandbox = EFIPAY_ENV === 'sandbox';
 const EFIPAY_BASE = isSandbox
   ? 'https://pix-h.api.efipay.com.br'
   : 'https://pix.api.efipay.com.br';
-const OAUTH_URL = isSandbox
-  ? 'https://sandbox-api.efipay.com.br'
-  : 'https://api.efipay.com.br';
+// OAuth usa o MESMO base do PIX (com mTLS)
+const OAUTH_URL = EFIPAY_BASE;
+
 
 // Agente mTLS
 let agent = null;
@@ -47,7 +47,7 @@ async function getOAuthToken() {
   }
   const auth = Buffer.from(`${EFIPAY_CLIENT_ID}:${EFIPAY_CLIENT_SECRET}`).toString('base64');
   const res = await axios.post(
-    `${OAUTH_URL}/v1/authorize`,
+   `${OAUTH_URL}/oauth/token`,
     { grant_type: 'client_credentials' },
     {
       headers: {
