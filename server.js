@@ -84,14 +84,16 @@ app.post('/pix/charge', requireRelaySecret, async (req, res) => {
       return res.status(400).json({ error: 'valor e descricao sao obrigatorios' });
     }
     const token = await getOAuthToken();
-    const payload = {
-      calendario: { expiracao: 3600 },
-      devedor: { cpf: '00000000000', nome: 'Pagador' },
-      valor: { original: parseFloat(valor).toFixed(2) },
-      chave: PIX_KEY,
-      solicitacaoPagador: descricao,
-      ...(txid ? { txid } : {}),
-    };
+      const { cpf, nome } = req.body;
+  const payload = {
+    calendario: { expiracao: 3600 },
+    valor: { original: parseFloat(valor).toFixed(2) },
+    chave: PIX_KEY,
+    solicitacaoPagador: descricao,
+    ...(cpf && nome ? { devedor: { cpf: cpf.replace(/\D/g, ''), nome } } : {}),
+    ...(txid ? { txid } : {})
+  };
+
     const response = await axios.post(`${EFIPAY_BASE}/v2/cob`, payload, {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       httpsAgent: getAgent(),
